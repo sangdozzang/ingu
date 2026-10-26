@@ -3,517 +3,291 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>우리 동네 인구 검색</title>
-
+<title>우리 동네 인구 구조 🏘️</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 <style>
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  padding: 30px 16px;
-  background: #f3f6fc;
-  color: #172033;
-  font-family: Arial, "Malgun Gothic", sans-serif;
-}
-
-main {
-  max-width: 720px;
-  margin: 20px auto;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.description {
-  text-align: center;
-  color: #65718a;
-  margin-bottom: 30px;
-  line-height: 1.6;
-}
-
-.panel {
-  background: white;
-  padding: 28px;
-  border-radius: 18px;
-  box-shadow: 0 8px 25px #0000000c;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.search-row {
-  display: flex;
-  gap: 10px;
-}
-
-input {
-  flex: 1;
-  min-width: 0;
-  padding: 13px;
-  font-size: 16px;
-  border: 1px solid #ccd4e2;
-  border-radius: 10px;
-}
-
-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
-  background: #315bd6;
-  color: white;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #2448b6;
-}
-
-#suggestions {
-  display: none;
-  margin-top: 8px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  overflow: auto;
-  max-height: 240px;
-}
-
-#suggestions button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  border-radius: 0;
-  background: white;
-  color: #172033;
-  border-bottom: 1px solid #eee;
-}
-
-#suggestions button:hover {
-  background: #edf2ff;
-}
-
-#status {
-  color: #65718a;
-  font-size: 14px;
-  line-height: 1.6;
-  margin-top: 16px;
-}
-
-#result {
-  display: none;
-  margin-top: 25px;
-}
-
-#placeName {
-  font-size: 23px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-#asof {
-  color: #65718a;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.stat {
-  padding: 18px 12px;
-  background: #f3f6fc;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.stat.total {
-  background: #e7edff;
-}
-
-.stat-label {
-  color: #65718a;
-  font-size: 14px;
-}
-
-.number {
-  font-size: 23px;
-  font-weight: bold;
-  margin-top: 12px;
-  overflow-wrap: anywhere;
-}
-
-.unit {
-  font-size: 13px;
-  color: #65718a;
-}
-
-footer {
-  margin-top: 22px;
-  text-align: center;
-  font-size: 12px;
-  color: #65718a;
-  line-height: 1.7;
-}
-
-footer a {
-  color: #315bd6;
-}
-
-@media (max-width: 550px) {
-  .search-row {
-    flex-direction: column;
+  :root{
+    --bg:#FFFDF7; --card:#FFF6E0; --border:#F0E2BC;
+    --accent:#E8930C; --gold:#F4B400; --text:#3A2E1A; --muted:#9A8B6A; --shadow:rgba(180,140,20,.18);
   }
-
-  .stats {
-    grid-template-columns: 1fr;
-  }
-
-  .stat {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: left;
-  }
-
-  .number {
-    margin-top: 0;
-    font-size: 20px;
-  }
-}
+  body[data-theme="mint"]{--bg:#F4FFFB;--card:#E7FBF3;--border:#C7F0E0;--accent:#0EA371;--gold:#34D399;--text:#0F3D2E;--muted:#6FA992;--shadow:rgba(16,185,129,.18);}
+  body[data-theme="berry"]{--bg:#FFF7FA;--card:#FFE9F1;--border:#FBD5E5;--accent:#E23C86;--gold:#F9A8D4;--text:#4A1D33;--muted:#B98098;--shadow:rgba(236,72,153,.18);}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);transition:background .3s;
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;}
+  .wrap{max-width:600px;margin:0 auto;padding:24px 18px 48px;}
+  .themes{display:flex;gap:6px;justify-content:flex-end;margin-bottom:8px;}
+  .themes button{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:99px;
+    padding:5px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .themes button.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+  h1{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin:.1rem 0;}
+  h1 .a{color:var(--accent);}
+  .under{width:60px;height:4px;border-radius:99px;margin:.4rem 0 .6rem;
+    background:linear-gradient(90deg,var(--gold),var(--accent));}
+  input#q{width:100%;font-size:1rem;padding:.6rem .7rem;border:1px solid var(--border);
+    border-radius:.7rem;background:#fff;color:var(--text);margin-bottom:14px;}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;
+    box-shadow:0 1px 4px var(--shadow);}
+  .card .k{font-size:.74rem;color:var(--muted);font-weight:700;}
+  .card .v{font-size:1.15rem;font-weight:800;color:var(--accent);margin-top:2px;}
+  #py{width:100%;}
+  .foot{color:var(--muted);font-size:.8rem;margin-top:14px;}
+  /* ── 지도 카드 ── */
+  .mapcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;
+    box-shadow:0 1px 4px var(--shadow);margin-bottom:14px;}
+  .mapcard .mt{font-weight:800;margin-bottom:8px;}
+  .mctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:.85rem;font-weight:700;}
+  .mctl select,.mctl input{border:1px solid var(--border);border-radius:.6rem;padding:.35rem .5rem;
+    font-family:inherit;font-size:.88rem;background:#fff;color:var(--text);}
+  .mctl input{width:62px;}
+  .mapbox{position:relative;}
+  #map{width:100%;height:auto;display:block;}   /* 반응형: 가로 100% */
+  #map path{stroke:#fff;stroke-width:.4;cursor:pointer;}
+  #map path.hl{stroke:var(--accent);stroke-width:1.1;filter:brightness(1.12);}
+  .lgd{position:absolute;left:4px;bottom:4px;display:flex;align-items:center;gap:6px;
+    font-size:.72rem;font-weight:700;color:var(--muted);background:rgba(255,255,255,.82);border-radius:8px;padding:3px 8px;}
+  .lgd .bar{width:90px;height:8px;border-radius:99px;background:linear-gradient(90deg,#FFF3D6,#D9480F);}
+  #tip{position:absolute;pointer-events:none;background:rgba(255,255,255,.97);border:1px solid var(--border);
+    border-radius:10px;padding:7px 10px;font-size:.78rem;line-height:1.45;box-shadow:0 3px 12px var(--shadow);
+    white-space:nowrap;z-index:5;color:#3A2E1A;}
+  #tip b{font-size:.84rem;}
+  .rank{font-size:.8rem;margin-top:8px;}
+  .rank button{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:99px;
+    padding:2px 8px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:inherit;margin:0 3px 4px 0;}
+  .rank button:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+  @media(max-width:560px){.cards{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
-
 <body>
-<main>
-  <h1>우리 동네 인구 검색</h1>
-
-  <p class="description">
-    동네 이름을 검색하면 총인구와 남자·여자 인구를 확인할 수 있습니다.
-  </p>
-
-  <section class="panel">
-    <label for="placeInput">동네 이름 검색</label>
-
-    <div class="search-row">
-      <input
-        id="placeInput"
-        type="search"
-        placeholder="예: 상도제1동, 역삼1동"
-        autocomplete="off"
-      >
-      <button id="searchBtn" type="button">검색</button>
+  <div class="wrap">
+    <div class="themes" id="themes">
+      <button data-th="" class="on">🍞 크림</button>
+      <button data-th="mint">🌿 민트</button>
+      <button data-th="berry">🍓 베리</button>
     </div>
+    <h1>🏘️ 우리 동네 <span class="a">인구 구조</span></h1>
+    <div class="under"></div>
 
-    <div id="suggestions"></div>
-    <p id="status">인구 데이터를 불러오는 중입니다...</p>
-
-    <div id="result">
-      <div id="placeName"></div>
-      <div id="asof"></div>
-
-      <div class="stats">
-        <div class="stat total">
-          <div>
-            <div class="stat-label">총인구</div>
-            <div class="unit">명</div>
-          </div>
-          <div id="total" class="number"></div>
-        </div>
-
-        <div class="stat">
-          <div>
-            <div class="stat-label">남자 인구</div>
-            <div class="unit">명</div>
-          </div>
-          <div id="male" class="number"></div>
-        </div>
-
-        <div class="stat">
-          <div>
-            <div class="stat-label">여자 인구</div>
-            <div class="unit">명</div>
-          </div>
-          <div id="female" class="number"></div>
-        </div>
+    <!-- 지도: 전국을 색으로 보고, 클릭하면 아래 대시보드가 그 지역으로 바뀜 -->
+    <div class="mapcard">
+      <div class="mt">🗺️ 전국에서 우리 동네는?</div>
+      <div class="mctl">
+        <select id="metric">
+          <option value="65,100" selected>고령화율 (65세 이상)</option>
+          <option value="0,14">유소년 비율 (0~14세)</option>
+          <option value="13,18">청소년 비율 (13~18세)</option>
+          <option value="14,14">만 14세 비율</option>
+          <option value="0,6">영유아 비율 (0~6세)</option>
+          <option value="0,0">0세 비율 (갓 태어난 아기)</option>
+          <option value="custom">✏️ 직접 입력</option>
+        </select>
+        <span id="customAge" hidden>만 <input id="ageLo" type="number" value="0" min="0" max="100">세 ~
+          <input id="ageHi" type="number" value="100" min="0" max="100">세</span>
       </div>
+      <div class="mapbox" id="mapbox">
+        <svg id="map"></svg>
+        <div class="lgd"><span id="lgMin"></span><span class="bar"></span><span id="lgMax"></span></div>
+        <div id="tip" hidden></div>
+      </div>
+      <div class="rank" id="rankTop"></div>
+      <div class="rank" id="rankLow"></div>
     </div>
-  </section>
 
-  <footer>
-    데이터 출처:
-    <a href="https://raw.githubusercontent.com/greatsong/modudata/main/data/population_latest.csv"
-       target="_blank" rel="noopener">
-      행정구역별 인구 CSV
-    </a>
-    <br>
-    최신 데이터는 인터넷에서 불러옵니다.
-  </footer>
-</main>
+    <input id="q" list="regions" placeholder="동네 이름 입력 (예: 서울특별시 종로구)">
+    <datalist id="regions"></datalist>
+    <div class="cards" id="cards"></div>
+    <div id="py"></div>
+    <p class="foot">데이터: 행정안전부 주민등록 인구(매월 자동 갱신)</p>
+  </div>
 
 <script>
-const CSV_URL =
-  "https://raw.githubusercontent.com/greatsong/modudata/main/data/population_latest.csv";
+const 기본지역 = "서울특별시 종로구"; // ← 보고 싶은 지역으로 바꿔도 돼요
+const DATA_URL = "https://raw.githubusercontent.com/greatsong/modudata/main/data/population_latest.csv";
+const MAP_URL = "https://raw.githubusercontent.com/greatsong/modudata/main/data/sigungu_pop.json";
 
-const input = document.getElementById("placeInput");
-const suggestions = document.getElementById("suggestions");
-const statusText = document.getElementById("status");
-const result = document.getElementById("result");
+let HEADER = [], INDEX = {};
+const num = s => parseInt(String(s).replace(/[^0-9-]/g,''),10) || 0;   // 따옴표·천단위 쉼표 제거
+// 따옴표로 감싼 CSV 한 줄 파싱 (값 안에 쉼표가 있어 단순 split 불가)
+function parseCSV(line){const o=[];let c='',q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===','&&!q){o.push(c);c='';}else c+=ch;}o.push(c);return o;}
+const cleanName = s => s.replace(/\s*\(\d+\)\s*$/,'').replace(/\s+/g,' ').trim();  // "서울…종로구 (1111…)" → "서울…종로구"
 
-let records = [];
-let columns = null;
-
-// CSV 파싱: 큰따옴표 안의 쉼표를 구분자로 처리하지 않음
-function parseCSV(text) {
-  const rows = [];
-  let row = [];
-  let field = "";
-  let quoted = false;
-
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-
-    if (quoted) {
-      if (ch === '"') {
-        if (text[i + 1] === '"') {
-          field += '"';
-          i++;
-        } else {
-          quoted = false;
-        }
-      } else {
-        field += ch;
-      }
-    } else {
-      if (ch === '"' && field.length === 0) {
-        quoted = true;
-      } else if (ch === ",") {
-        row.push(field);
-        field = "";
-      } else if (ch === "\n") {
-        row.push(field.replace(/\r$/, ""));
-        rows.push(row);
-        row = [];
-        field = "";
-      } else {
-        field += ch;
-      }
-    }
+function ageBySex(cells){
+  const m = new Array(101).fill(0), f = new Array(101).fill(0);
+  for(let i=1;i<HEADER.length;i++){
+    const mm = HEADER[i].match(/_(\d+)세/); if(!mm) continue;   // 총인구수·연령구간 열은 건너뜀
+    const a = Math.min(100, +mm[1]);
+    if(HEADER[i].includes('_남_')) m[a]+=num(cells[i]);
+    else if(HEADER[i].includes('_여_')) f[a]+=num(cells[i]);    // _계_ 열은 무시(남+여만)
   }
+  return { m, f };
+}
+const rsum = (a,lo,hi)=>{ let s=0; for(let i=lo;i<=hi;i++) s+=a[i]; return s; };
 
-  if (field.length || row.length) {
-    row.push(field.replace(/\r$/, ""));
-    rows.push(row);
-  }
-
-  return rows.filter(r => r.some(v => v.trim() !== ""));
+function drawPyramid(m, f){
+  const ages=Array.from({length:101},(_,i)=>i);   // 0~100세(100+) 1세 단위
+  const mx=Math.max(...m,...f,1);
+  const step=Math.max(500, Math.ceil(mx/4/500)*500), lim=Math.ceil(mx/step)*step;
+  const tv=[]; for(let v=-lim; v<=lim; v+=step) tv.push(v);
+  Plotly.react('py',[
+    {y:ages,x:m.map(v=>-v),name:'남자',type:'bar',orientation:'h',marker:{color:'#4C8DF6'},
+     customdata:m,hovertemplate:'%{y}세 · 남 %{customdata:,}명<extra></extra>'},
+    {y:ages,x:f,name:'여자',type:'bar',orientation:'h',marker:{color:'#F4789B'},
+     hovertemplate:'%{y}세 · 여 %{x:,}명<extra></extra>'}
+  ],{
+    barmode:'relative', bargap:0.15, height:560, margin:{l:46,r:14,t:6,b:28},
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'-apple-system,"Malgun Gothic",sans-serif',size:12,color:'#333'},
+    legend:{orientation:'h',x:0.5,xanchor:'center',y:1.03},
+    xaxis:{tickvals:tv,ticktext:tv.map(v=>Math.abs(v).toLocaleString()),zeroline:true,zerolinecolor:'#ccc',gridcolor:'rgba(0,0,0,.06)',fixedrange:true},
+    yaxis:{dtick:10,ticksuffix:'세',range:[-0.6,100.6],fixedrange:true}
+  },{displayModeBar:false,responsive:true});
 }
 
-// 지역 이름 뒤의 괄호와 숫자 제거
-function cleanName(name) {
-  return String(name || "")
-    .trim()
-    .replace(/\s*\(\d+\)\s*$/, "")
-    .trim();
+function show(name){
+  const cells = INDEX[name]; if(!cells) return;
+  const {m,f} = ageBySex(cells);
+  const mT = rsum(m,0,100), fT = rsum(f,0,100), total = mT+fT;
+  const old = rsum(m,65,100)+rsum(f,65,100), young = rsum(m,0,14)+rsum(f,0,14);
+  const pct = n => total ? (n/total*100).toFixed(1)+'%' : '-';
+  document.getElementById('cards').innerHTML = `
+    <div class="card"><div class="k">총인구</div><div class="v">${total.toLocaleString()}</div></div>
+    <div class="card"><div class="k">남 / 여</div><div class="v" style="font-size:.92rem">${mT.toLocaleString()}<br>${fT.toLocaleString()}</div></div>
+    <div class="card"><div class="k">고령화율 65+</div><div class="v">${pct(old)}</div></div>
+    <div class="card"><div class="k">유소년 0-14</div><div class="v">${pct(young)}</div></div>`;
+  drawPyramid(m, f);
 }
 
-// 숫자에 포함된 쉼표 제거
-function parseNumber(value) {
-  const cleaned = String(value ?? "").replace(/,/g, "").trim();
+/* ───────── 지도 ───────── */
+const AGE = {}, VALS = {}, RANK = {};   // 나이 배열 캐시 · 현재 지표값 · 전국 순위
+let MAPREG = [], NREG = 0;              // [{n:지역명, el:path}]
 
-  if (!cleaned || cleaned === "-" || cleaned === "N/A") {
-    return null;
-  }
-
-  const number = Number(cleaned);
-  return Number.isFinite(number) ? number : null;
+function ageOf(name){        // 나이별 인구(남+여 합) — 지역당 1번만 계산해 저장
+  if(AGE[name]) return AGE[name];
+  const cells = INDEX[name]; if(!cells) return null;
+  const {m,f} = ageBySex(cells);
+  const arr = m.map((v,i)=>v+f[i]);
+  return AGE[name] = { arr, total: rsum(arr,0,100) };
 }
-
-// 숫자에 천 단위 쉼표 표시
-function formatNumber(number) {
-  return number === null
-    ? "자료 없음"
-    : number.toLocaleString("ko-KR");
+function metricRange(){      // 선택된 지표의 나이 구간 [시작, 끝]
+  const sel = document.getElementById('metric').value;
+  if(sel !== 'custom') return sel.split(',').map(Number);
+  const cl = v => Math.min(100, Math.max(0, parseInt(v,10)||0));
+  let lo = cl(document.getElementById('ageLo').value), hi = cl(document.getElementById('ageHi').value);
+  return lo<=hi ? [lo,hi] : [hi,lo];
 }
+const fmt = v => v.toFixed(v<10?2:1)+'%';
+const 시도약칭 = {'강원특별자치도':'강원','경기도':'경기','경상남도':'경남','경상북도':'경북','광주광역시':'광주','대구광역시':'대구','대전광역시':'대전','부산광역시':'부산','서울특별시':'서울','세종특별자치시':'세종','울산광역시':'울산','인천광역시':'인천','전라남도':'전남','전북특별자치도':'전북','제주특별자치도':'제주','충청남도':'충남','충청북도':'충북'};
+const 짧은이름 = n => { const [a,...r]=n.split(' '); const s=시도약칭[a]||a.slice(0,2); return r.length ? s+' '+r.join(' ') : s; };
 
-// 가장 최신 월의 총인구·남자·여자 열 찾기
-function findPopulationColumns(headers) {
-  const months = [
-    ...new Set(
-      headers
-        .map(h => {
-          const match = h.match(/^(\d{4}년\d{2}월)_/);
-          return match ? match[1] : null;
-        })
-        .filter(Boolean)
-    )
-  ].sort((a, b) => b.localeCompare(a));
-
-  for (const month of months) {
-    const total = headers.indexOf(`${month}_계_총인구수`);
-    const male = headers.indexOf(`${month}_남_총인구수`);
-    const female = headers.indexOf(`${month}_여_총인구수`);
-
-    if (total >= 0 && male >= 0 && female >= 0) {
-      return { month, total, male, female };
-    }
-  }
-
-  throw new Error(
-    "총인구·남자·여자 인구 열을 찾지 못했습니다."
-  );
-}
-
-// CSV 데이터 불러오기
-async function loadData() {
-  try {
-    const response = await fetch(CSV_URL, {
-      cache: "no-cache"
-    });
-
-    if (!response.ok) {
-      throw new Error(`데이터 요청 실패: ${response.status}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-
-    // EUC-KR 인코딩을 UTF-8 문자열로 변환
-    const text = new TextDecoder("euc-kr").decode(buffer);
-
-    const rows = parseCSV(text);
-
-    if (rows.length < 2) {
-      throw new Error("CSV 데이터가 비어 있습니다.");
-    }
-
-    const headers = rows[0].map(h => h.trim());
-
-    // 지역명 열 찾기
-    const nameIndex = headers.findIndex(h =>
-      ["행정구역", "행정구역명", "지역"].includes(h)
-    );
-
-    if (nameIndex < 0) {
-      throw new Error("지역 이름 열을 찾지 못했습니다.");
-    }
-
-    columns = findPopulationColumns(headers);
-
-    records = rows.slice(1).map(row => ({
-      name: cleanName(row[nameIndex]),
-      total: parseNumber(row[columns.total]),
-      male: parseNumber(row[columns.male]),
-      female: parseNumber(row[columns.female])
-    })).filter(record => record.name);
-
-    statusText.textContent =
-      `데이터를 불러왔습니다. ${records.length.toLocaleString("ko-KR")}개 지역`;
-
-  } catch (error) {
-    console.error(error);
-
-    statusText.textContent =
-      "데이터를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요. " +
-      "파일을 직접 열었을 때 차단된다면 로컬 웹 서버에서 실행해 보세요.";
-  }
-}
-
-// 검색 결과 목록 표시
-function searchPlaces() {
-  const query = input.value.trim().toLocaleLowerCase("ko-KR");
-
-  suggestions.replaceChildren();
-  suggestions.style.display = "none";
-
-  if (!query) {
-    statusText.textContent = "동네 이름을 입력해 주세요.";
-    return;
-  }
-
-  const matches = records.filter(record =>
-    record.name.toLocaleLowerCase("ko-KR").includes(query)
-  );
-
-  if (matches.length === 0) {
-    statusText.textContent = "검색 결과가 없습니다.";
-    return;
-  }
-
-  // 정확히 일치하는 지역이 하나면 바로 표시
-  const exact = matches.find(record =>
-    record.name.toLocaleLowerCase("ko-KR") === query
-  );
-
-  if (exact) {
-    showRecord(exact);
-    return;
-  }
-
-  // 검색 결과 목록 만들기
-  matches.slice(0, 50).forEach(record => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = record.name;
-
-    button.addEventListener("click", () => {
-      showRecord(record);
-    });
-
-    suggestions.appendChild(button);
+function buildMap(list){
+  // 투영: x=경도×cos(36°) (위도 보정), y=－위도. ×100은 보기 좋은 숫자 크기로
+  const kx = Math.cos(36*Math.PI/180)*100, ky = 100;
+  const px = lon => lon*kx, py = lat => -lat*ky;
+  let x0=1e9, y0=1e9, x1=-1e9, y1=-1e9;
+  list.forEach(g=>g.p.forEach(poly=>poly.forEach(ring=>ring.forEach(pt=>{
+    const x=px(pt[0]), y=py(pt[1]);
+    if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y;
+  }))));
+  const svg = document.getElementById('map');
+  svg.setAttribute('viewBox', `${(x0-2).toFixed(1)} ${(y0-2).toFixed(1)} ${(x1-x0+4).toFixed(1)} ${(y1-y0+4).toFixed(1)}`);
+  const dByName = new Map();   // 같은 이름(청주시 3조각)은 path 하나로 합침
+  list.forEach(g=>{
+    let d='';
+    g.p.forEach(poly=>poly.forEach(ring=>{
+      d += 'M'+ring.map(pt=>px(pt[0]).toFixed(1)+' '+py(pt[1]).toFixed(1)).join('L')+'Z';
+    }));
+    dByName.set(g.n, (dByName.get(g.n)||'')+d);
   });
-
-  suggestions.style.display = "block";
-  statusText.textContent =
-    `${matches.length.toLocaleString("ko-KR")}개 지역이 검색되었습니다. 지역을 선택해 주세요.`;
+  dByName.forEach((d,n)=>{
+    const el = document.createElementNS('http://www.w3.org/2000/svg','path');
+    el.setAttribute('d', d);
+    el.addEventListener('pointerenter', ()=>{ el.classList.add('hl'); svg.appendChild(el); });  // 하이라이트(외곽선이 안 가리게 맨 위로)
+    el.addEventListener('pointermove', e=>showTip(e,n));
+    el.addEventListener('pointerdown', e=>showTip(e,n));   // 모바일 터치도 툴팁
+    el.addEventListener('pointerleave', ()=>{ el.classList.remove('hl'); hideTip(); });
+    el.addEventListener('click', ()=>pick(n));
+    svg.appendChild(el);
+    MAPREG.push({n, el});
+  });
 }
-
-// 선택한 지역의 인구 표시
-function showRecord(record) {
-  document.getElementById("placeName").textContent = record.name;
-
-  document.getElementById("asof").textContent =
-    `${columns.month} 기준`;
-
-  document.getElementById("total").textContent =
-    formatNumber(record.total);
-
-  document.getElementById("male").textContent =
-    formatNumber(record.male);
-
-  document.getElementById("female").textContent =
-    formatNumber(record.female);
-
-  result.style.display = "block";
-  suggestions.style.display = "none";
-
-  input.value = record.name;
-  statusText.textContent = "선택한 지역의 인구 정보입니다.";
+function paint(){            // 지표에 맞게 색 칠하기 + 범례 + 랭킹
+  const [lo,hi] = metricRange();
+  const vs = [];
+  MAPREG.forEach(({n})=>{
+    const a = ageOf(n);
+    const v = (a && a.total) ? rsum(a.arr,lo,hi)/a.total*100 : null;
+    VALS[n] = v; if(v!=null) vs.push(v);
+  });
+  const vMin = Math.min(...vs), vMax = Math.max(...vs);
+  const t2c = t => `rgb(${Math.round(255+(217-255)*t)},${Math.round(243+(72-243)*t)},${Math.round(214+(15-214)*t)})`;  // 크림→주황
+  MAPREG.forEach(({n,el})=>{
+    const v = VALS[n];
+    el.setAttribute('fill', v==null ? '#eee' : t2c((v-vMin)/(vMax-vMin||1)));
+  });
+  document.getElementById('lgMin').textContent = fmt(vMin);
+  document.getElementById('lgMax').textContent = fmt(vMax);
+  const sorted = MAPREG.filter(({n})=>VALS[n]!=null).map(({n})=>n).sort((a,b)=>VALS[b]-VALS[a]);
+  NREG = sorted.length; sorted.forEach((n,i)=>RANK[n]=i+1);   // 전국 순위(내림차순)
+  const btns = ns => ns.map(n=>`<button data-n="${n}">${짧은이름(n)} ${fmt(VALS[n])}</button>`).join('');
+  document.getElementById('rankTop').innerHTML = '🏆 상위 5 · '+btns(sorted.slice(0,5));
+  document.getElementById('rankLow').innerHTML = '🐢 하위 5 · '+btns(sorted.slice(-5).reverse());
 }
-
-// 검색 버튼 클릭
-document.getElementById("searchBtn")
-  .addEventListener("click", searchPlaces);
-
-// 엔터 키로 검색
-input.addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    searchPlaces();
-  }
-
-  if (event.key === "Escape") {
-    suggestions.style.display = "none";
-  }
+const tip = document.getElementById('tip');
+function showTip(e,n){
+  const v = VALS[n], a = ageOf(n);
+  tip.innerHTML = `<b>${n}</b><br>총인구 ${a?a.total.toLocaleString():'-'}명<br>`+
+    (v==null?'-':`${fmt(v)} · 전국 ${NREG}곳 중 <b>${RANK[n]}위</b>`);
+  tip.hidden = false;
+  const r = document.getElementById('mapbox').getBoundingClientRect();   // 화면 밖으로 안 나가게
+  tip.style.left = Math.max(0, Math.min(e.clientX-r.left+14, r.width-tip.offsetWidth-2))+'px';
+  tip.style.top  = Math.max(0, e.clientY-r.top-tip.offsetHeight-10)+'px';
+}
+function hideTip(){ tip.hidden = true; }
+function pick(n){            // 지도·랭킹 클릭 → 아래 대시보드를 그 지역으로
+  if(!INDEX[n]) return;
+  const q = document.getElementById('q');
+  q.value = n; show(n);
+  q.scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.getElementById('metric').addEventListener('change', ()=>{
+  document.getElementById('customAge').hidden = document.getElementById('metric').value!=='custom';
+  paint();
 });
+['ageLo','ageHi'].forEach(id=>document.getElementById(id).addEventListener('input', paint));
+['rankTop','rankLow'].forEach(id=>document.getElementById(id).addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(b) pick(b.dataset.n);
+}));
 
-// 페이지 실행 시 데이터 불러오기
-loadData();
+document.getElementById('themes').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  document.body.dataset.theme = b.dataset.th; localStorage.setItem('pop_theme', b.dataset.th);
+  document.querySelectorAll('.themes button').forEach(x=>x.classList.toggle('on', x===b));
+});
+const st = localStorage.getItem('pop_theme') || '';
+document.body.dataset.theme = st;
+document.querySelectorAll('.themes button').forEach(x=>x.classList.toggle('on', x.dataset.th===st));
+
+(async ()=>{
+  const [buf, mapData] = await Promise.all([
+    fetch(DATA_URL).then(r=>r.arrayBuffer()),
+    fetch(MAP_URL).then(r=>r.json()).catch(()=>fetch("sigungu_pop.json").then(r=>r.json()))   // 원격 실패 시 같은 폴더 파일로
+  ]);
+  const text = new TextDecoder('euc-kr').decode(buf);   // 행안부 원본은 cp949 인코딩
+  const lines = text.trim().split(/\r?\n/);
+  HEADER = parseCSV(lines[0]);
+  const dl = document.getElementById('regions');
+  lines.slice(1).forEach(line=>{
+    const cells = parseCSV(line); const name = cleanName(cells[0]);
+    INDEX[name] = cells;
+    const o = document.createElement('option'); o.value = name; dl.appendChild(o);
+  });
+  const q = document.getElementById('q'); q.value = 기본지역;
+  q.addEventListener('input', ()=>{ if(INDEX[q.value]) show(q.value); });
+  buildMap(mapData.sigungu);
+  paint();
+  show(기본지역);
+})().catch(e=>document.getElementById('cards').textContent = '⚠️ ' + e.message);
 </script>
 </body>
 </html>
